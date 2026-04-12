@@ -4,6 +4,7 @@ from data.users import User
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import Flask, render_template
 import data.db_session as db_session
+from data.products import Product
 
 db_session.global_init('db/shop.db')
 
@@ -13,7 +14,10 @@ app.secret_key = 'dev_secret_key_123'
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    session = db_session.create_session()
+    products = session.query(Product).filter(Product.stock > 0).all()
+    session.close()
+    return render_template('index.html', products=products)
 
 
 login_manager = LoginManager()
