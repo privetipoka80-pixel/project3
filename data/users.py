@@ -1,9 +1,10 @@
 import sqlalchemy as sa
 from data.db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin 
 
 
-class User(SqlAlchemyBase):
+class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
@@ -21,3 +22,6 @@ class User(SqlAlchemyBase):
 
     def is_seller(self):
         return self.role == 'seller'
+
+    def is_user(self):
+        return self.role == 'user'
