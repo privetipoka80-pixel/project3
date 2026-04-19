@@ -13,6 +13,7 @@ class User(SqlAlchemyBase, UserMixin):
     hashed_password = sa.Column(sa.String, nullable=True)
     role = sa.Column(sa.String, nullable=True, default='user')
     created_at = sa.Column(sa.DateTime, default=sa.func.now())
+    products = sa.orm.relationship("Product", back_populates="seller", cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
@@ -25,3 +26,6 @@ class User(SqlAlchemyBase, UserMixin):
 
     def is_user(self):
         return self.role == 'user'
+
+    def is_admin(self):
+        return self.role == 'admin'
