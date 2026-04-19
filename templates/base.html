@@ -13,8 +13,11 @@
         <div class="nav-links">
             <a href="/">Главная</a>
             {% if current_user.is_authenticated %}
-                <span>{{ current_user.username }}</span>
-                <a href="/logout">Выйти</a>
+                {% if current_user.is_seller or  current_user.is_admin%}
+                <a href="/product/add">Добавить товар</a>
+                {% endif %}
+            <span>{{ current_user.username }}</span>
+            <a href="/logout">Выйти</a>
             {% else %}
                 <a href="/login">Вход</a>
                 <a href="/register">Регистрация</a>
