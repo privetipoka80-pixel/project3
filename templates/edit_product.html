@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать товар{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h2>Редактировать товар</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Название товара:</label>
+            <input type="text" name="name" required value="{{ form.name.data if form.name.data else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Описание:</label>
+            <textarea name="description" rows="4" required
+                style="resize: none;">{{ form.description.data if form.description.data else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Цена (₽):</label>
+            <input type="number" name="price" step="0.01" required
+                value="{{ form.price.data if form.price.data else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Категория:</label>
+            <input type="text" name="category" value="{{ form.category.data if form.category.data else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Количество:</label>
+            <input type="number" name="stock" required value="{{ form.stock.data if form.stock.data else '' }}">
+        </div>
+        <div class="form-group">
+            <label>Добавить новые изображения:</label>
+            <input type="file" name="images" accept="image/*" multiple>
+            <small>Вы можете выбрать несколько изображений для добавления</small>
+        </div>
+        <button type="submit" class="btn">
+             Сохранить изменения
+        </button>
+        <a href="/product/{{ product.id if product else '#' }}" class="btn">Отмена</a>
+    </form>
+
+    {% if product and product.images and product.images|length > 0 %}
+    <h3 style="margin-top: 2rem;">Текущие изображения</h3>
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for image in product.images %}
+        <div class="{% if image.is_main %}image-card-main{% else %}image-card{% endif %}"
+            style="border-radius: 8px; padding: 0.5rem; text-align: center;">
+            <img src="/static/uploads/{{ image.image_url }}"
+                style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+            <div style="margin-top: 0.5rem;">
+                {% if image.is_main %}
+                <span style="font-weight: bold;">Главное фото</span>
+                {% endif %}
+                <a href="/product/delete-image/{{ image.id }}" class="btn btn-sm"
+                    onclick="return confirm('Удалить это изображение?')">
+                     Удалить
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

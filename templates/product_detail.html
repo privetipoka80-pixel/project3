@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <!-- 1. ГАЛЕРЕЯ -->
+    <div class="gallery-fullwidth">
+        <div class="main-image-container">
+            <img src="/static/uploads/{{ product.main_image if product.main_image else 'no-image.jpg' }}" 
+                 id="mainImage" 
+                 class="main-image" 
+                 alt="{{ product.name }}">
+        </div>
+        
+        {% if product.images and product.images|length > 1 %}
+        <div class="thumbnails">
+            {% for image in product.images|sort(attribute='sort_order') %}
+            <img src="/static/uploads/{{ image.image_url }}" 
+                 class="thumbnail {% if image.is_main %}thumbnail-active{% endif %}"
+                 onclick="document.getElementById('mainImage').src='/static/uploads/{{ image.image_url }}'; this.parentNode.querySelectorAll('.thumbnail').forEach(t=>t.classList.remove('thumbnail-active')); this.classList.add('thumbnail-active');"
+                 alt="Фото">
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 2. ИНФОРМАЦИЯ О ТОВАРЕ -->
+    <div class="product-info-section">
+        <!-- Название -->
+        <h1 class="product-name">{{ product.name }}</h1>
+        
+        <!-- Цена -->
+        <div class="product-price">{{ product.price }} ₽</div>
+        
+        <!-- Категория и наличие в одну строку -->
+        <div class="product-meta-row">
+            <span class="meta-item">
+                <strong>Категория:</strong> {{ product.category if product.category else 'Разное' }}
+            </span>
+            <span class="meta-item">
+                <strong>В наличии:</strong> {{ product.stock }} шт.
+            </span>
+        </div>
+        
+        <!-- Описание -->
+        <div class="product-description-block">
+            <h3>Описание</h3>
+            <p>{{ product.description }}</p>
+        </div>
+        
+        <!-- Кнопки действий -->
+        <div class="action-buttons">
+            {% if current_user.is_authenticated and product.stock > 0 %}
+            <form method="POST" action="/order/{{ product.id }}" class="buy-form">
+                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-input">
+                <button type="submit" class="btn btn-primary">Купить</button>
+            </form>
+            {% endif %}
+            
+            {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_seller()) %}
+            <a href="/product/edit/{{ product.id }}" class="btn">
+                 Редактировать
+            </a>
+            <a href="/product/delete/{{ product.id }}" class="btn" onclick="return confirm('Удалить товар?')">
+                 Удалить
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
