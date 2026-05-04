@@ -23,7 +23,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     products = sqlalchemy.orm.relationship(
         "Product", back_populates="seller", cascade="all, delete-orphan")
 
-    # ДОБАВИТЬ ЭТИ ДВЕ СТРОКИ:
     reviews = sqlalchemy.orm.relationship(
         "Review", back_populates="user", cascade="all, delete-orphan")
 
