@@ -60,12 +60,69 @@
             
             {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_seller()) %}
             <a href="/product/edit/{{ product.id }}" class="btn">
-                 Редактировать
+                <img src="{{ icons.edit }}" alt=""> Редактировать
             </a>
             <a href="/product/delete/{{ product.id }}" class="btn" onclick="return confirm('Удалить товар?')">
-                 Удалить
+                <img src="{{ icons.delete }}" alt=""> Удалить
             </a>
             {% endif %}
+        </div>
+    </div>
+    
+    <!-- 3. ОТЗЫВЫ -->
+    <div class="reviews-section">
+        <h3 class="reviews-title">Отзывы ({{ reviews|length }})</h3>
+        
+        {% if current_user.is_authenticated %}
+        <div class="review-form-container">
+            <h4>Оставить отзыв</h4>
+            <form method="POST" action="/review/add/{{ product.id }}">
+                <div class="form-group">
+                    <label>Оценка:</label>
+                    <select name="rating">
+                        <option value="5">5 звёзд (Отлично)</option>
+                        <option value="4">4 звезды (Хорошо)</option>
+                        <option value="3">3 звезды (Средне)</option>
+                        <option value="2">2 звезды (Плохо)</option>
+                        <option value="1">1 звезда (Ужасно)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Комментарий:</label>
+                    <textarea name="comment" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn">Отправить отзыв</button>
+            </form>
+        </div>
+        {% endif %}
+        
+        <!-- Список отзывов -->
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-author-info">
+                        <div class="rating">
+                            {% for i in range(review.rating) %}★{% endfor %}
+                            {% for i in range(5 - review.rating) %}☆{% endfor %}
+                        </div>
+                        <strong class="review-author">{{ review.username }}</strong>
+                        <span class="review-date">{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    </div>
+                    {% if current_user.is_authenticated and (current_user.is_admin() or review.user_id == current_user.id) %}
+                    <div class="review-actions">
+                        <a href="/review/edit/{{ review.id }}" class="btn btn-sm">
+                            <img src="{{ icons.edit }}" alt="">
+                        </a>
+                        <a href="/review/delete/{{ review.id }}" class="btn btn-sm" onclick="return confirm('Удалить отзыв?')">
+                            <img src="{{ icons.delete }}" alt="">
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="review-text">{{ review.comment }}</div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

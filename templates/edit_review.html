@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать отзыв{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Редактировать отзыв</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Оценка:</label>
+            <select name="rating">
+                <option value="5" {% if form.rating.data == 5 %}selected{% endif %}>5 звёзд (Отлично)</option>
+                <option value="4" {% if form.rating.data == 4 %}selected{% endif %}>4 звезды (Хорошо)</option>
+                <option value="3" {% if form.rating.data == 3 %}selected{% endif %}>3 звезды (Средне)</option>
+                <option value="2" {% if form.rating.data == 2 %}selected{% endif %}>2 звезды (Плохо)</option>
+                <option value="1" {% if form.rating.data == 1 %}selected{% endif %}>1 звезда (Ужасно)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Комментарий:</label>
+            <textarea name="comment" rows="3" required>{{ form.comment.data }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="/product/{{ review.product_id }}" class="btn btn-warning">Отмена</a>
+    </form>
+</div>
+{% endblock %}

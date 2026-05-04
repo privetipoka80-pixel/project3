@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<h1>Мои заказы</h1>
+<div class="products-grid">
+    {% for order in orders %}
+    <div class="product-card">
+        <div class="product-info">
+            <div class="product-title">{{ order.product.name }}</div>
+            <div class="product-price">{{ order.total_price }} ₽</div>
+            <p>Количество: {{ order.quantity }} шт.</p>
+            <p>Статус: 
+                {% if order.status == 'pending' %}Ожидает
+                {% elif order.status == 'completed' %}Выполнен
+                {% else %}Отменён
+                {% endif %}
+            </p>
+            <p>Дата: {{ order.order_date.strftime('%d.%m.%Y %H:%M') }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

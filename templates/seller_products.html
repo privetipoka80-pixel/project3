@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Главная - Мой Магазин{% endblock %}
+{% block title %}Мои товары{% endblock %}
 
 {% block content %}
-<h1>Товары в наличии</h1>
+<h1>Мои товары</h1>
+<a href="/product/add" class="btn" style="margin-bottom: 1rem;">
+    <img src="{{ icons.add }}" alt=""> Добавить товар
+</a>
 <div class="products-grid">
     {% for product in products %}
     <div class="product-card">
@@ -11,8 +14,11 @@
         <div class="product-info">
             <div class="product-title">{{ product.name }}</div>
             <div class="product-price">{{ product.price }} ₽</div>
-            <div class="product-category">{{ product.category if product.category else 'Разное' }}</div>
+            <div class="product-category">В наличии: {{ product.stock }} шт.</div>
             <a href="/product/{{ product.id }}" class="btn">Подробнее</a>
+            <a href="/product/edit/{{ product.id }}" class="btn">
+                <img src="{{ icons.edit }}" alt=""> Редактировать
+            </a>
         </div>
     </div>
     {% endfor %}

@@ -1,34 +1,22 @@
-from flask import request, redirect, Flask, render_template
-from forms.forms import *
-from data.users import User
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
-import data.db_session as db_session
-from data.reviews import Review
-from forms.forms import ReviewForm
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from data import db_session
+from data.users import User
 from data.products import Product
 from data.product_images import ProductImage
+from data.reviews import Review
+from data.orders import Order
 import os
 from datetime import datetime
-
-
-db_session.global_init('db/shop.db')
+from forms.forms import *
 
 app = Flask(__name__)
-app.secret_key = 'dev_secret_key_123'
+app.secret_key = 'secret_key_shop_12345_abcde'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-
-@app.route('/')
-def index():
-    session = db_session.create_session()
-    products = session.query(Product).filter(Product.stock > 0).all()
-    session.close()
-    return render_template('index.html', products=products)
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -37,47 +25,86 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    session = db_session.create_session()
-    user = session.query(User).get(user_id)
-    session.close()
+    session_db = db_session.create_session()
+    user = session_db.query(User).filter(User.id == user_id).first()
+    session_db.close()
     return user
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        session = db_session.create_session()
-        if session.query(User).filter(User.username == form.username.data).first():
-            return render_template('register.html', form=form, error='Username exists')
-        if session.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', form=form, error='Email exists')
+db_session.global_init('db/shop.db')
 
-        user = User()
-        user.username = form.username.data
-        user.email = form.email.data
-        user.set_password(form.password.data)
-        user.role = 'user'
-        session.add(user)
-        session.commit()
-        session.close()
-        return redirect('/login')
-    return render_template('register.html', form=form)
+
+@app.context_processor
+def utility_processor():
+    return {
+        'icons': {
+            'logo': '/static/icons/logo.png',
+            'home': '/static/icons/home.png',
+            'products': '/static/icons/products.png',
+            'add': '/static/icons/add.png',
+            'orders': '/static/icons/orders.png',
+            'user': '/static/icons/user.png',
+            'logout': '/static/icons/logout.png',
+            'login': '/static/icons/login.png',
+            'register': '/static/icons/register.png',
+            'edit': '/static/icons/edit.png',
+            'delete': '/static/icons/delete.png',
+        }
+    }
+
+
+@app.route('/')
+def index():
+    session_db = db_session.create_session()
+    products = session_db.query(Product).filter(
+        Product.stock > 0).order_by(Product.created_at.desc()).all()
+    for product in products:
+        _ = product.images
+    session_db.close()
+    return render_template('index.html', products=products)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        session = db_session.create_session()
-        user = session.query(User).filter(
+        session_db = db_session.create_session()
+        user = session_db.query(User).filter(
             User.username == form.username.data).first()
-        session.close()
+        session_db.close()
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect('/')
-        return render_template('login.html', form=form, error='Invalid credentials')
+        else:
+            return render_template('login.html', form=form, error='Invalid username or password')
     return render_template('login.html', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        session_db = db_session.create_session()
+
+        if session_db.query(User).filter(User.username == form.username.data).first():
+            session_db.close()
+            return render_template('register.html', form=form, error='Username already exists')
+
+        if session_db.query(User).filter(User.email == form.email.data).first():
+            session_db.close()
+            return render_template('register.html', form=form, error='Email already exists')
+
+        user = User()
+        user.username = form.username.data
+        user.email = form.email.data
+        user.set_password(form.password.data)
+        user.role = 'user'
+        session_db.add(user)
+        session_db.commit()
+        session_db.close()
+        return redirect('/login')
+
+    return render_template('register.html', form=form)
 
 
 @app.route('/logout')
@@ -237,8 +264,12 @@ def product_detail(product_id):
     _ = product.images
     _ = product.seller
 
+    reviews = session_db.query(Review).filter(
+        Review.product_id == product_id).order_by(Review.created_at.desc()).all()
+    for review in reviews:
+        _ = review.user
     session_db.close()
-    return render_template('product_detail.html', product=product)
+    return render_template('product_detail.html', product=product, reviews=reviews)
 
 
 @app.route('/review/add/<int:product_id>', methods=['POST'])
@@ -304,5 +335,56 @@ def delete_review(review_id):
     return redirect(f'/product/{product_id}')
 
 
+@app.route('/order/<int:product_id>', methods=['POST'])
+@login_required
+def create_order(product_id):
+    quantity = int(request.form['quantity'])
+    session_db = db_session.create_session()
+    product = session_db.query(Product).filter(
+        Product.id == product_id).first()
+    if not product or product.stock < quantity:
+        session_db.close()
+        return redirect(f'/product/{product_id}')
+
+    total_price = product.price * quantity
+    order = Order()
+    order.user_id = current_user.id
+    order.product_id = product_id
+    order.quantity = quantity
+    order.total_price = total_price
+    product.stock -= quantity
+    session_db.add(order)
+    session_db.commit()
+    session_db.close()
+    return redirect('/orders')
+
+
+@app.route('/orders')
+@login_required
+def my_orders():
+    session_db = db_session.create_session()
+    orders = session_db.query(Order).filter(
+        Order.user_id == current_user.id).order_by(Order.order_date.desc()).all()
+    for order in orders:
+        _ = order.product
+    session_db.close()
+    return render_template('orders.html', orders=orders)
+
+
+@app.route('/seller/products')
+@login_required
+def seller_products():
+    if not current_user.is_seller() and not current_user.is_admin():
+        return redirect('/')
+
+    session_db = db_session.create_session()
+    products = session_db.query(Product).filter(
+        Product.seller_id == current_user.id).all()
+    for product in products:
+        _ = product.images
+    session_db.close()
+    return render_template('seller_products.html', products=products)
+
+
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=5000, host='0.0.0.0')
