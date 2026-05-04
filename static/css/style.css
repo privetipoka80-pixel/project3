@@ -1,49 +1,120 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Roboto,sans-serif;background:#f5f5f5;color:#333;line-height:1.5}
+.navbar{background:#fff;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:bold}
+.logo img{height:32px}
+.logo a{color:#333;text-decoration:none}
+.nav-links{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+.nav-links a{display:flex;align-items:center;gap:6px;color:#666;text-decoration:none}
+.nav-links a:hover{color:#000}
+.nav-links img{width:18px;height:18px}
+.container{max-width:1200px;margin:2rem auto;padding:0 1rem}
+
+/* ЕДИНЫЙ СТИЛЬ КНОПОК */
+.btn{
+    padding:0.6rem 1.2rem;
+    border:1px solid #333;
+    border-radius:6px;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-weight:500;
+    font-size:0.95rem;
+    background:#fff;
+    color:#333;
+    transition:all 0.2s ease;
+}
+.btn:hover{
+    background:#333;
+    color:#fff;
+}
+.btn img{width:16px;height:16px}
+.btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem}
+.btn-primary{
+    background:#fff;
+    color:#333;
+    border:2px solid #333;
+    font-weight:600;
+}
+.btn-primary:hover{
+    background:#333;
+    color:#fff;
 }
 
-body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #f5f5f5;
-    color: #333;
-}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2rem;margin-top:2rem}
+.product-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:box-shadow 0.2s ease}
+.product-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+.product-image{width:100%;height:200px;object-fit:contain;background:#f8f9fa;padding:1rem}
+.product-info{padding:1rem}
+.product-title{font-size:1.1rem;font-weight:600;margin-bottom:0.5rem}
+.product-price{font-size:1.3rem;color:#333;font-weight:bold}
+.form-container{max-width:500px;margin:2rem auto;background:#fff;padding:2rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;margin-bottom:0.5rem;font-weight:500}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;font-size:1rem}
+textarea{resize:none;min-height:100px}
+.product-detail{background:#fff;border-radius:16px;overflow:hidden}
 
-.navbar {
-    background: white;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-    top: 0;
-}
+/* ГАЛЕРЕЯ */
+.gallery-fullwidth{display:flex;flex-direction:column;gap:1rem;padding:2rem;background:#fff}
+.gallery-fullwidth .main-image-container{width:100%;min-height:500px;background:#f8f9fa;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:1rem;text-align:center}
+.gallery-fullwidth .main-image{max-width:100%;max-height:500px;width:auto;height:auto;object-fit:contain;display:block;margin:0 auto}
+.gallery-fullwidth .thumbnails{display:flex;gap:0.75rem;overflow-x:auto;overflow-y:hidden;justify-content:center;padding:0.5rem 1rem;scrollbar-width:thin;scrollbar-color:#ddd transparent;-webkit-overflow-scrolling:touch}
+.gallery-fullwidth .thumbnails::-webkit-scrollbar{height:6px}
+.gallery-fullwidth .thumbnails::-webkit-scrollbar-track{background:transparent}
+.gallery-fullwidth .thumbnails::-webkit-scrollbar-thumb{background-color:#ddd;border-radius:3px}
+.thumbnail{width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #ddd;cursor:pointer;flex-shrink:0;scroll-snap-align:start;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;transition:border-color 0.2s}
+.thumbnail:hover{border-color:#666}
+.thumbnail-active{border-color:#333 !important;box-shadow:0 0 0 2px rgba(0,0,0,0.2)}
 
-.container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
+/* ИНФОРМАЦИЯ О ТОВАРЕ */
+.product-info-section{padding:2rem;background:#fff;border-bottom:1px solid #eee}
+.product-info-section .product-name{font-size:2rem;font-weight:600;margin-bottom:0.5rem;color:#333}
+.product-info-section .product-price{font-size:1.8rem;color:#333;font-weight:bold;margin-bottom:1rem}
+.product-meta-row{display:flex;gap:2rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee}
+.meta-item{color:#666;font-size:0.95rem}
+.meta-item strong{color:#333}
+.product-description-block{margin-bottom:1.5rem}
+.product-description-block h3{font-size:1.2rem;font-weight:600;margin-bottom:0.75rem;color:#333}
+.product-description-block p{font-size:1rem;line-height:1.7;color:#555;white-space:pre-wrap}
+.action-buttons{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;padding-top:1rem;border-top:1px solid #eee}
+.buy-form{display:flex;gap:0.5rem;align-items:center}
 
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
+/* ОТЗЫВЫ */
+.reviews-section{padding:2rem;background:#f8f9fa}
+.reviews-title{font-size:1.5rem;font-weight:600;margin-bottom:1.5rem;color:#333}
+.review-form-container{background:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;border:1px solid #ddd}
+.review-form-container h4{font-size:1.1rem;font-weight:600;margin-bottom:1rem;color:#333}
+.reviews-list{display:flex;flex-direction:column;gap:1rem}
+.review-card{background:#fff;padding:1.5rem;border-radius:8px;border:1px solid #ddd}
+.review-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem}
+.review-author-info{display:flex;flex-direction:column;gap:0.25rem}
+.review-author-info .rating{color:#ffc107;font-size:1.1rem}
+.review-author{color:#333;font-weight:600;font-size:1rem}
+.review-date{color:#999;font-size:0.85rem}
+.review-text{color:#555;line-height:1.6;font-size:1rem}
+.review-actions{display:flex;gap:0.5rem}
 
-.product-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+/* АЛЕРТЫ */
+.alert{padding:1rem;border-radius:6px;margin-bottom:1rem;border:1px solid}
+.alert-success{background:#f0f9f0;color:#2d5a2d;border-color:#c3e6cb}
+.alert-error{background:#fdf0f0;color:#5a2d2d;border-color:#f5c6cb}
 
-.form-container {
-    max-width: 400px;
-    margin: 2rem auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
+/* АДАПТИВНОСТЬ */
+@media (max-width: 768px) {
+    .gallery-fullwidth{padding:1rem}
+    .gallery-fullwidth .main-image-container{min-height:350px;padding:0.5rem}
+    .gallery-fullwidth .main-image{max-height:350px}
+    .thumbnail{width:70px;height:70px}
+    .product-info-section{padding:1rem}
+    .product-meta-row{flex-direction:column;gap:0.5rem}
+    .action-buttons{flex-direction:column;align-items:stretch}
+    .buy-form{width:100%}
+    .buy-form .quantity-input{flex:1}
+    .reviews-section{padding:1rem}
+    .review-header{flex-direction:column;gap:0.5rem}
+    .navbar{padding:1rem}
+    .nav-links{gap:1rem}
 }
