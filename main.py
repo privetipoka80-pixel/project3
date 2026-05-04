@@ -4,7 +4,8 @@ from data.users import User
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 import data.db_session as db_session
-
+from data.reviews import Review
+from forms.forms import ReviewForm
 from data.products import Product
 from data.product_images import ProductImage
 import os
@@ -238,6 +239,69 @@ def product_detail(product_id):
 
     session_db.close()
     return render_template('product_detail.html', product=product)
+
+
+@app.route('/review/add/<int:product_id>', methods=['POST'])
+@login_required
+def add_review(product_id):
+    form = ReviewForm(request.form)
+    if form.validate():
+        review = Review()
+        review.product_id = product_id
+        review.user_id = current_user.id
+        review.rating = form.rating.data
+        review.comment = form.comment.data
+        session_db = db_session.create_session()
+        session_db.add(review)
+        session_db.commit()
+        session_db.close()
+    return redirect(f'/product/{product_id}')
+
+
+@app.route('/review/edit/<int:review_id>', methods=['GET', 'POST'])
+@login_required
+def edit_review(review_id):
+    session_db = db_session.create_session()
+    review = session_db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        session_db.close()
+        return redirect('/')
+    product_id = review.product_id
+    if not current_user.is_admin() and review.user_id != current_user.id:
+        session_db.close()
+        return redirect(f'/product/{product_id}')
+
+    form = ReviewForm(request.form)
+    if request.method == 'POST' and form.validate():
+        review.rating = form.rating.data
+        review.comment = form.comment.data
+        session_db.commit()
+        session_db.close()
+        return redirect(f'/product/{product_id}')
+
+    form.rating.data = review.rating
+    form.comment.data = review.comment
+    session_db.close()
+    return render_template('edit_review.html', form=form, review=review)
+
+
+@app.route('/review/delete/<int:review_id>')
+@login_required
+def delete_review(review_id):
+    session_db = db_session.create_session()
+    review = session_db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        session_db.close()
+        return redirect('/')
+    product_id = review.product_id
+    if not current_user.is_admin() and review.user_id != current_user.id:
+        session_db.close()
+        return redirect(f'/product/{product_id}')
+
+    session_db.delete(review)
+    session_db.commit()
+    session_db.close()
+    return redirect(f'/product/{product_id}')
 
 
 if __name__ == '__main__':

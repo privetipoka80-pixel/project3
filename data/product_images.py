@@ -15,7 +15,8 @@ class ProductImage(SqlAlchemyBase, SerializerMixin):
     image_url = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     is_main = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     sort_order = sqlalchemy.Column(sqlalchemy.Integer, default=0)
-    created_at = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    created_at = sqlalchemy.Column(
+        sqlalchemy.DateTime, default=datetime.datetime.now)
 
     product = sqlalchemy.orm.relationship("Product", back_populates="images")
 

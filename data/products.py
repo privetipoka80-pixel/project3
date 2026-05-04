@@ -14,3 +14,4 @@ class Product(SqlAlchemyBase):
     created_at = sa.Column(sa.DateTime, default=sa.func.now())
     seller = sa.orm.relationship("User", back_populates="products")
     images = sa.orm.relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
+    reviews = sa.orm.relationship("Review", back_populates="product", cascade="all, delete-orphan")

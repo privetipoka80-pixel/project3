@@ -16,6 +16,7 @@ def global_init(db_file):
     __factory = orm.sessionmaker(bind=engine)
 
     from data import users, products, product_images, reviews
+    
     SqlAlchemyBase.metadata.create_all(engine)
 
 def create_session() -> Session:
