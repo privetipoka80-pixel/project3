@@ -76,7 +76,7 @@ def login():
             login_user(user)
             return redirect('/')
         else:
-            return render_template('login.html', form=form, error='Invalid username or password')
+            return render_template('login.html', form=form, error='Неверное имя пользователя или пароль')
     return render_template('login.html', form=form)
 
 
@@ -88,11 +88,11 @@ def register():
 
         if session_db.query(User).filter(User.username == form.username.data).first():
             session_db.close()
-            return render_template('register.html', form=form, error='Username already exists')
+            return render_template('register.html', form=form, error='Имя пользователя уже существует')
 
         if session_db.query(User).filter(User.email == form.email.data).first():
             session_db.close()
-            return render_template('register.html', form=form, error='Email already exists')
+            return render_template('register.html', form=form, error='Электронная почта уже существует')
 
         user = User()
         user.username = form.username.data
@@ -387,4 +387,33 @@ def seller_products():
 
 
 if __name__ == '__main__':
+    from data import db_session
+    from data.users import User
+
+    db_session.global_init('db/shop.db')
+    session = db_session.create_session()
+
+    any_user = session.query(User).first()
+    
+    if not any_user:
+        admin = User()
+        admin.username = 'seller'
+        admin.email = 'seller@example.com'
+        admin.set_password('seller')
+        admin.role = 'admin'
+        session.add(admin)
+        session.commit()
+        print("=" * 50)
+        print("Администратор создан:")
+        print("Логин: seller")
+        print("Пароль: seller")
+        print("=" * 50)
+    else:
+        print(f"В базе уже есть {session.query(User).count()} пользователь(ей)")
+        admins = session.query(User).filter(User.role == 'admin').all()
+        if admins:
+            print(f"Существующие администраторы: {[a.username for a in admins]}")
+
+    session.close()
+
     app.run(debug=True, port=5000, host='0.0.0.0')
