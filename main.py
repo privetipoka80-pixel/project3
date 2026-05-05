@@ -14,9 +14,11 @@ from forms.forms import *
 app = Flask(__name__)
 app.secret_key = 'secret_key_shop_12345_abcde'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['DATABASE'] = 'db/shop.db'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(os.path.dirname(app.config['DATABASE']), exist_ok=True)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -31,7 +33,7 @@ def load_user(user_id):
     return user
 
 
-db_session.global_init('db/shop.db')
+db_session.global_init(app.config['DATABASE'])
 
 
 @app.context_processor
@@ -390,7 +392,7 @@ if __name__ == '__main__':
     from data import db_session
     from data.users import User
 
-    db_session.global_init('db/shop.db')
+    db_session.global_init(app.config['DATABASE'])
     session = db_session.create_session()
 
     any_user = session.query(User).first()
