@@ -1,5 +1,5 @@
 from wtforms import Form, StringField, PasswordField, TextAreaField, FloatField, IntegerField, SelectField
-from wtforms.validators import DataRequired, Length, Email, NumberRange
+from wtforms.validators import DataRequired, InputRequired, Length, Email, NumberRange
 import re
 
 
@@ -23,7 +23,7 @@ class ProductForm(Form):
                        DataRequired(), NumberRange(min=0.01)])
     category = StringField('Category', validators=[Length(max=100)])
     stock = IntegerField('Stock', validators=[
-                         DataRequired(), NumberRange(min=0)])
+                         InputRequired(), NumberRange(min=0)])
 
 
 class ReviewForm(Form):

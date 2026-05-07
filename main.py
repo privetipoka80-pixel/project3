@@ -192,8 +192,11 @@ def edit_product(product_id):
                 product_image.is_main = (len(product.images) == 0 and i == 0)
                 product_image.sort_order = len(product.images) + i
                 session_db.add(product_image)
+        saved_stock = product.stock
         session_db.commit()
         session_db.close()
+        if saved_stock <= 0:
+            return redirect('/')
         return redirect(f'/product/{product_id}')
 
     form.name.data = product.name
@@ -260,6 +263,10 @@ def product_detail(product_id):
     product = session_db.query(Product).filter(
         Product.id == product_id).first()
     if not product:
+        session_db.close()
+        return redirect('/')
+
+    if product.stock <= 0:
         session_db.close()
         return redirect('/')
 
@@ -344,9 +351,9 @@ def create_order(product_id):
     session_db = db_session.create_session()
     product = session_db.query(Product).filter(
         Product.id == product_id).first()
-    if not product or product.stock < quantity:
+    if not product or product.stock <= 0 or quantity <= 0 or product.stock < quantity:
         session_db.close()
-        return redirect(f'/product/{product_id}')
+        return redirect('/')
 
     total_price = product.price * quantity
     order = Order()
@@ -381,7 +388,8 @@ def seller_products():
 
     session_db = db_session.create_session()
     products = session_db.query(Product).filter(
-        Product.seller_id == current_user.id).all()
+        Product.seller_id == current_user.id,
+        Product.stock > 0).all()
     for product in products:
         _ = product.images
     session_db.close()
